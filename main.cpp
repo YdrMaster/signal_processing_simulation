@@ -15,6 +15,7 @@ int main() {
     
     for (auto i = 0; i < x0.size(); ++i) x0[i] *= 1 + 5.0f * i / x0.size();
     
+    // 1 MHz 采样不变，幅值调整到 [0,4095)
     auto normalized = std::vector<float>(x0);
     normalize(normalized, 1000.0f);
     SAVE_SIGNAL_TF("../data/shorted_to_send.txt", normalized, static_cast<unsigned short>(x + 2048));
