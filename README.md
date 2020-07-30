@@ -1,4 +1,4 @@
-# signal_processing_simulation# 信号处理仿真
+# 信号处理仿真
 
 环境：
 
