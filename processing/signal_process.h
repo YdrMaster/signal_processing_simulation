@@ -50,6 +50,20 @@ void normalize(
         n = n * target / max;
 }
 
+/**
+ * 重采样
+ * @remarks 重采样用于把某一采样率的信号用新的采样率重新采样，可以进行升采样，也可以进行降采样。
+ *          重采样的原理是先大倍数升采样，再在近似新采样率下抽取，
+ *          因此，仅当新采样率与原采样率有整倍数关系，重采样才保证准确性。
+ *          否则，倍率越大，采样越准。
+ * @tparam times 处理倍率
+ * @tparam size0 原信号长度（确保 `signal.size() < size0`）
+ * @tparam size1 新信号长度（点数不够将补 0）
+ * @param signal 原信号
+ * @param f0 原采样率
+ * @param f1 新采样率
+ * @return 重采样信号
+ */
 template<auto times, auto size0, auto size1>
 std::vector<float> resample(
     std::vector<float> const &signal,
@@ -67,10 +81,12 @@ std::vector<float> resample(
     }
     ifft<times * size0>(enlarged.data());
     
-    auto      target = std::vector<float>(size1);
-    for (auto i      = 0; i < size1; ++i)
-        target[i] = enlarged[n_downsampling * i].re;
-    
+    auto      target = std::vector<float>(size1, 0);
+    for (auto i      = 0; i < size1; ++i) {
+        auto j = n_downsampling * i;
+        if (j >= enlarged.size()) break;
+        target[i] = enlarged[j].re;
+    }
     return target;
 }
 
