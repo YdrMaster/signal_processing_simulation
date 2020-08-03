@@ -11,17 +11,18 @@ using vec = std::vector<t>;
 using w3 = walsh_t<3>;
 
 int main() {
-    auto x0 = build_signal<1000>(1e6, chirp_linear(39e3f, 60.5e3f, 1e-3f));
+    auto x0 = build_signal<2048>(1e6, chirp_linear(39e3f, 61e3f, 2.048e-3f));
     
     for (auto i = 0; i < x0.size(); ++i) x0[i] *= 1 + 5.0f * i / x0.size();
     
     // 1 MHz 采样不变，幅值调整到 [0,4095)
     auto normalized = std::vector<float>(x0);
-    normalize(normalized, 1000.0f);
+    normalize(normalized, 2047.0f);
+    normalized.push_back(0);
     SAVE_SIGNAL_TF("../data/shorted_to_send.txt", normalized, static_cast<unsigned short>(x + 2048));
     
     // 重采样到 808 周期对应的参考信号
-    auto resampled = resample<64, 8192, 256>(send_signal<8192>(x0), 1e6f, 1e8f / 808);
+    auto resampled = resample<64, 8192, 512>(send_signal<8192>(x0), 1e6f, 1e8f / 808);
     normalize(resampled, 1024.0f);
     SAVE_SIGNAL_FORMAT("../data/shorted_for_reference.txt", resampled, static_cast<short>(x) << ',');
     return 0;
